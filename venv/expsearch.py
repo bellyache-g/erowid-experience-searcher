@@ -1,10 +1,7 @@
-# to do
-# figure out why I can't .strip() the title of the report
-# figure out how to write to text file
-
 import requests
 from bs4 import BeautifulSoup
 import time
+import os
 
 
 urlcount = 0
@@ -55,9 +52,30 @@ for i in range(900000):
     else:
         print("found @ URL #" + str(urlcount) + " " + str(fixedtitle) + " " + updatedurl)
 
-        #nospace = soup.text
-        #reallynospace = nospace.strip()
-        #print(reallynospace)
-        outfile.write(str(fixedtitle) + " " + updatedurl + "\n")
+        nospace = soup.text
+        reallynospace = nospace.strip()
+        reallynospace = reallynospace.replace("[ View as PDF (for printing) ]", '')
+        reallynospace = reallynospace.replace("[ View as LaTeX (for geeks) ]",'')
+        reallynospace = reallynospace.replace("COPYRIGHTS: All reports are copyright Erowid and you agree not to download or analyze the report data without contacting Erowid Center and receiving permission first.", '')
+        reallynospace = reallynospace.replace("""Experience Reports are the writings and opinions of the individual authors who submit them.
+Some of the activities described are dangerous and/or illegal and none are recommended by Erowid Center.""", '')
+        reallynospace = reallynospace.replace("""Erowid Experience Vault
+© 1995-2017 Erowid""", '')
+        reallynospace = os.linesep.join([s for s in reallynospace.splitlines() if s])
+        reallynospace = reallynospace.replace("""More than 2 million people use Erowid every month.
+During the pandemic, only 70 of those contributed $1 or more.
+Donations are down significantly. Please Contribute.""", '')
+        reallynospace = reallynospace.replace("""Erowid - Honest Global Drug Information
+We're an educational non-profit working to provide a balanced, honest look at
+psychoactive drugs and drug use--to reduce harms, improve benefits, & support
+reasonable policies. This work is made possible by $10, $50, & $100 donations.""", '')
+        reallynospace = reallynospace.replace("""Thinning Out Your Physical Library?
+If you have books or periodicals about drugs, contribute them to Erowid!
+Your old books will find a good home in our library or for a supporter. [details]""", '')
+        reallynospace = reallynospace.replace("[ Switch Colors ]", '')
+
+
+        print(reallynospace)
+        outfile.write(str(fixedtitle) + " " + updatedurl + "\n" + reallynospace)
 
 #   time.sleep(.2)
