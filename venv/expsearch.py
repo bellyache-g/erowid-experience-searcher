@@ -1,29 +1,63 @@
+# to do
+# figure out why I can't .strip() the title of the report
+# figure out how to write to text file
+
 import requests
 from bs4 import BeautifulSoup
 import time
-import csv
-import random
 
-# iterate through possible php ids
 
 urlcount = 0
+foundurls = 0
+outfile = open('experience.txt', 'a')
+
+# cycle through potential PHP id #'s
 
 for i in range(900000):
-    updatedurl = F'https://www.erowid.org/experiences/exp.php?ID={i}'
+    # generate links to cycle through up to 900k
+    updatedurl = F"https://www.erowid.org/experiences/exp.php?ID={i}"
+
+    # add one to urlcount variable to keep running total of how many URLs we've found
     urlcount += 1
-    print('trying URL ' + str(urlcount) + ' is something here?')
+
+    # let user know what number URL we're trying
+
+
+    # make request and get webpage from link generator
     urlget = requests.get(updatedurl)
-    urltry = urlget.content
+
+
+    urltry = urlget.text
+
+
     soup = BeautifulSoup(urltry, 'html.parser')
+
+    # find the title with the <title> tag of the post
+    title = soup.title
+
+    #string the title
+
+    titlestring = str(title)
+
+    # fix the fucker
+    fixedtitle1 = titlestring.replace("<title>", '')
+
+    # fix it again
+    fixedtitle2 = fixedtitle1.replace("</title>", '')
+
+    # final fix
+    fixedtitle = fixedtitle2.replace(" - Erowid Exp - ", "-")
+
     issomethinghere = soup.find_all("div", class_="title")
+
     if issomethinghere == []:
-        print('no')
+        continue
     else:
-        print('yes: ' + str(issomethinghere))
-        print(updatedurl)
-#       craziness = soup.find('body')
-#       print(craziness)
+        print("found @ URL #" + str(urlcount) + " " + str(fixedtitle) + " " + updatedurl)
 
-    #time.sleep(.2)
+        #nospace = soup.text
+        #reallynospace = nospace.strip()
+        #print(reallynospace)
+        outfile.write(str(fixedtitle) + " " + updatedurl + "\n")
 
-
+#   time.sleep(.2)
